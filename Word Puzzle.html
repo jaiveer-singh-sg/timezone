@@ -1,0 +1,1074 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Word Quest - Topic Word Search</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --bg-color: #0f111a;
+            --panel-bg: rgba(26, 29, 46, 0.6);
+            --border-glow: rgba(0, 242, 254, 0.3);
+            --border-glow-active: rgba(0, 242, 254, 0.8);
+            --primary-accent: #00f2fe;
+            --secondary-accent: #4facfe;
+            --success-color: #00ff87;
+            --error-color: #ff3366;
+            --text-main: #f0f3ff;
+            --text-muted: #8a9fc4;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Outfit', sans-serif;
+            background: radial-gradient(circle at 50% 50%, #1a1e36 0%, var(--bg-color) 80%);
+            color: var(--text-main);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            overflow-x: hidden;
+        }
+
+        .container {
+            display: grid;
+            grid-template-columns: 280px 1fr 300px;
+            gap: 24px;
+            width: 100%;
+            max-width: 1200px;
+            margin-top: 20px;
+        }
+
+        @media (max-width: 1024px) {
+            .container {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 10px;
+        }
+
+        header h1 {
+            font-size: 2.8rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, var(--primary-accent), var(--secondary-accent));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-shadow: 0 0 20px rgba(0, 242, 254, 0.2);
+            letter-spacing: 2px;
+        }
+
+        header p {
+            color: var(--text-muted);
+            font-size: 1.1rem;
+            margin-top: 5px;
+        }
+
+        #header-topic {
+            display: inline-block;
+            margin-top: 8px;
+            padding: 4px 16px;
+            border-radius: 20px;
+            background: rgba(0, 242, 254, 0.1);
+            border: 1px solid rgba(0, 242, 254, 0.2);
+            color: var(--primary-accent);
+            font-size: 0.9rem;
+            font-weight: 600;
+        }
+
+        .glass-panel {
+            background: var(--panel-bg);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 20px;
+            padding: 24px;
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
+            transition: all 0.3s ease;
+        }
+
+        .glass-panel:hover {
+            border-color: var(--border-glow);
+            box-shadow: 0 8px 32px 0 rgba(0, 242, 254, 0.1);
+        }
+
+        .control-panel {
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            gap: 20px;
+        }
+
+        .stats-display {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .stat-box {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 12px;
+            padding: 15px;
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 1.8rem;
+            font-weight: 800;
+            color: var(--primary-accent);
+            text-shadow: 0 0 10px rgba(0, 242, 254, 0.4);
+            margin-top: 5px;
+        }
+
+        .button-group {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        button {
+            font-family: 'Outfit', sans-serif;
+            font-size: 1rem;
+            font-weight: 600;
+            padding: 14px 20px;
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .btn-start {
+            background: linear-gradient(135deg, #00f2fe, #4facfe);
+            color: #0f111a;
+            box-shadow: 0 0 15px rgba(0, 242, 254, 0.3);
+        }
+
+        .btn-start:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 0 25px rgba(0, 242, 254, 0.6);
+        }
+
+        .btn-reset {
+            background: rgba(255, 255, 255, 0.05);
+            color: var(--text-main);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .btn-reset:hover {
+            background: rgba(255, 255, 255, 0.1);
+            transform: translateY(-2px);
+        }
+
+        .btn-halt {
+            background: rgba(255, 51, 102, 0.1);
+            color: var(--error-color);
+            border: 1px solid rgba(255, 51, 102, 0.2);
+        }
+
+        .btn-halt:hover {
+            background: var(--error-color);
+            color: white;
+            box-shadow: 0 0 15px rgba(255, 51, 102, 0.4);
+            transform: translateY(-2px);
+        }
+
+        .board-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            position: relative;
+        }
+
+        .word-preview {
+            height: 40px;
+            font-size: 1.6rem;
+            font-weight: 700;
+            letter-spacing: 3px;
+            color: var(--primary-accent);
+            text-shadow: 0 0 8px rgba(0, 242, 254, 0.5);
+            margin-bottom: 15px;
+            text-align: center;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(8, 60px);
+            grid-template-rows: repeat(8, 60px);
+            gap: 8px;
+            background: rgba(0, 0, 0, 0.2);
+            padding: 12px;
+            border-radius: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            user-select: none;
+            touch-action: none;
+            position: relative;
+        }
+
+        @media (max-width: 600px) {
+            .grid {
+                grid-template-columns: repeat(8, 40px);
+                grid-template-rows: repeat(8, 40px);
+                gap: 5px;
+                padding: 8px;
+            }
+        }
+
+        .cell {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.4rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.15s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            color: var(--text-main);
+            position: relative;
+            z-index: 2;
+        }
+
+        @media (max-width: 600px) {
+            .cell {
+                font-size: 1rem;
+            }
+        }
+
+        .cell:hover {
+            border-color: var(--primary-accent);
+            background: rgba(0, 242, 254, 0.05);
+            transform: scale(1.05);
+        }
+
+        .cell.selected {
+            background: linear-gradient(135deg, var(--primary-accent), var(--secondary-accent));
+            color: #0f111a;
+            border-color: transparent;
+            font-weight: 800;
+            box-shadow: 0 0 15px rgba(0, 242, 254, 0.6);
+            transform: scale(1.1);
+            animation: pulse-select 0.3s ease;
+        }
+
+        @keyframes pulse-select {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.2); }
+            100% { transform: scale(1.1); }
+        }
+
+        .cell.correct {
+            animation: flash-green 0.5s ease-out;
+        }
+
+        .cell.incorrect {
+            animation: shake 0.4s ease-in-out;
+        }
+
+        @keyframes flash-green {
+            0%, 100% { background: rgba(0, 255, 135, 0.2); border-color: var(--success-color); }
+            50% { background: var(--success-color); color: #0f111a; }
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            20%, 60% { transform: translateX(-4px); }
+            40%, 80% { transform: translateX(4px); }
+        }
+
+        .found-panel {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .topic-badge {
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: var(--primary-accent);
+            text-align: center;
+            padding: 8px 12px;
+            background: rgba(0, 242, 254, 0.08);
+            border-radius: 12px;
+            border: 1px solid rgba(0, 242, 254, 0.15);
+        }
+
+        .word-list-container {
+            background: rgba(255, 255, 255, 0.02);
+            border-radius: 12px;
+            padding: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .word-list-label {
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            color: var(--text-muted);
+            letter-spacing: 1px;
+            margin-bottom: 8px;
+            font-weight: 600;
+        }
+
+        .word-list {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .word-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 6px 10px;
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.02);
+            font-size: 0.95rem;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .word-item .mark {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            border: 2px solid var(--text-muted);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.7rem;
+            flex-shrink: 0;
+            transition: all 0.3s ease;
+        }
+
+        .word-item.found {
+            background: rgba(0, 255, 135, 0.08);
+            border: 1px solid rgba(0, 255, 135, 0.15);
+        }
+
+        .word-item.found .mark {
+            background: var(--success-color);
+            border-color: var(--success-color);
+            color: #0f111a;
+        }
+
+        .word-item .word-text {
+            flex: 1;
+        }
+
+        .word-item .word-pts {
+            color: var(--success-color);
+            font-size: 0.8rem;
+        }
+
+        .found-title {
+            font-size: 1rem;
+            font-weight: 600;
+            color: var(--text-main);
+            border-bottom: 2px solid rgba(255, 255, 255, 0.05);
+            padding-bottom: 8px;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .found-count {
+            color: var(--primary-accent);
+            font-weight: 800;
+        }
+
+        .table-container {
+            flex-grow: 1;
+            overflow-y: auto;
+            max-height: 200px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: left;
+        }
+
+        th {
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            color: var(--text-muted);
+            padding: 8px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        td {
+            padding: 10px 8px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.02);
+            font-size: 0.95rem;
+        }
+
+        .word-row {
+            animation: slide-in 0.3s cubic-bezier(0.165, 0.84, 0.44, 1) forwards;
+        }
+
+        @keyframes slide-in {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .score-pill {
+            background: rgba(0, 242, 254, 0.1);
+            color: var(--primary-accent);
+            padding: 2px 8px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            border: 1px solid rgba(0, 242, 254, 0.2);
+        }
+
+        .grid-overlay {
+            position: absolute;
+            top: 12px;
+            left: 12px;
+            right: 12px;
+            bottom: 12px;
+            background: rgba(15, 17, 26, 0.9);
+            backdrop-filter: blur(8px);
+            border-radius: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 10;
+            text-align: center;
+            border: 1px solid var(--border-glow);
+            padding: 24px;
+        }
+
+        .overlay-title {
+            font-size: 1.8rem;
+            font-weight: 800;
+            color: var(--primary-accent);
+            margin-bottom: 8px;
+        }
+
+        .overlay-desc {
+            color: var(--text-muted);
+            margin-bottom: 20px;
+            max-width: 80%;
+            font-size: 0.95rem;
+        }
+
+        .topic-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            width: 100%;
+            max-width: 360px;
+        }
+
+        .topic-btn {
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 12px;
+            padding: 12px 8px;
+            font-family: 'Outfit', sans-serif;
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: var(--text-main);
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-transform: none;
+            letter-spacing: 0.5px;
+        }
+
+        .topic-btn:hover {
+            background: rgba(0, 242, 254, 0.1);
+            border-color: var(--primary-accent);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(0, 242, 254, 0.15);
+            color: var(--primary-accent);
+        }
+
+        .btn-clues {
+            background: rgba(255, 255, 255, 0.04);
+            color: var(--text-muted);
+            border: 1px dashed rgba(255, 255, 255, 0.15);
+            padding: 10px;
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .btn-clues:hover {
+            background: rgba(255, 215, 0, 0.08);
+            border-color: rgba(255, 215, 0, 0.3);
+            color: #ffd700;
+            transform: translateY(-2px);
+        }
+
+        .btn-clues.active {
+            background: rgba(255, 215, 0, 0.1);
+            border-color: rgba(255, 215, 0, 0.3);
+            color: #ffd700;
+            border-style: solid;
+        }
+
+        .home-btn {
+            position: fixed;
+            top: 14px;
+            left: 14px;
+            z-index: 999;
+            background: rgba(0, 242, 254, 0.08);
+            border: 1px solid rgba(0, 242, 254, 0.2);
+            color: var(--primary-accent);
+            padding: 7px 14px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-family: 'Outfit', sans-serif;
+            font-size: 0.8rem;
+            font-weight: 600;
+            transition: all 0.2s ease;
+            cursor: pointer;
+            backdrop-filter: blur(6px);
+        }
+
+        .home-btn:hover {
+            background: rgba(0, 242, 254, 0.18);
+            border-color: var(--primary-accent);
+            transform: translateY(-1px);
+        }
+
+        .hidden {
+            display: none !important;
+        }
+    </style>
+</head>
+<body>
+    <a href="index.html" class="home-btn">&#8962; Home</a>
+
+    <header>
+        <h1>WORD QUEST</h1>
+        <p>Choose a topic and find the hidden words!</p>
+        <div id="header-topic" class="hidden">Select a Topic</div>
+    </header>
+
+    <div class="container">
+        
+        <div class="glass-panel control-panel">
+            <div class="stats-display">
+                <div class="stat-box">
+                    <div>Round Score</div>
+                    <div id="round-score" class="stat-value">0</div>
+                </div>
+                <div class="stat-box">
+                    <div>Words Found</div>
+                    <div id="words-count-display" class="stat-value">0/5</div>
+                </div>
+                <div class="stat-box">
+                    <div>High Score</div>
+                    <div id="high-score" class="stat-value">0</div>
+                </div>
+            </div>
+
+            <div class="button-group">
+                <button id="btn-new-topic" class="btn-start">New Topic</button>
+                <button id="btn-reset" class="btn-reset">Reset Round</button>
+                <button id="btn-halt" class="btn-halt">Halt / Pause</button>
+            </div>
+        </div>
+
+        <div class="board-container">
+            <div id="word-preview" class="word-preview">CHOOSE A TOPIC</div>
+            
+            <div id="grid-board" class="grid">
+                <div id="start-overlay" class="grid-overlay">
+                    <div class="overlay-title">Pick a Topic</div>
+                    <div class="overlay-desc">Select a category to begin the word hunt!</div>
+                    <div id="topic-buttons" class="topic-grid"></div>
+                </div>
+
+                <div id="halt-overlay" class="grid-overlay hidden">
+                    <div class="overlay-title">Quest Halted</div>
+                    <div class="overlay-desc">The grid is hidden while game is paused. Resume when ready.</div>
+                    <button id="btn-resume" class="btn-start">Resume Quest</button>
+                </div>
+
+                <div id="complete-overlay" class="grid-overlay hidden">
+                    <div class="overlay-title">Victory!</div>
+                    <div class="overlay-desc" id="complete-desc">You found all 5 words!</div>
+                    <button id="btn-new-game" class="btn-start">New Game</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="glass-panel found-panel">
+            <div id="topic-display" class="topic-badge">&#127758; Select a Topic</div>
+            <button id="btn-clues" class="btn-clues">&#128161; Show Clues</button>
+            <div id="clue-list-container" class="word-list-container hidden">
+                <div class="word-list-label">&#127919; Words to Find:</div>
+                <div id="word-list" class="word-list"></div>
+            </div>
+            <div class="found-title">
+                <span>Found Words</span>
+                <span id="words-badge" class="found-count">0 / 5</span>
+            </div>
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Word</th>
+                            <th>Length</th>
+                            <th>Score</th>
+                        </tr>
+                    </thead>
+                    <tbody id="found-words-tbody"></tbody>
+                </table>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        const TOPICS = {
+            "Places": ["PARK", "BEACH", "BRIDGE", "MARKET", "GARDEN", "TEMPLE", "CASTLE", "HARBOR", "FOREST", "ISLAND", "PLAZA", "TOWER", "CANYON", "VILLAGE"],
+            "Animals": ["DOG", "CAT", "BIRD", "FISH", "HORSE", "TIGER", "LION", "BEAR", "WOLF", "DEER", "SNAKE", "EAGLE", "SHARK", "WHALE", "PANDA"],
+            "Food & Drinks": ["PIZZA", "PASTA", "BREAD", "JUICE", "MILK", "COFFEE", "TEA", "SOUP", "SALAD", "CAKE", "APPLE", "MANGO", "STEAK", "RICE", "WATER", "CHEESE"],
+            "Buildings": ["HOUSE", "SCHOOL", "HOSPITAL", "TOWER", "HOTEL", "CHURCH", "STORE", "BANK", "LIBRARY", "FACTORY", "MUSEUM", "STADIUM", "CABIN", "BARN", "GARAGE"],
+            "Jewelery": ["RING", "GEM", "PEARL", "CROWN", "MEDAL", "CHAIN", "BROOCH", "RUBY", "DIAMOND", "NECKLACE", "BRACELET", "EARRING", "LOCKET", "AMBER", "OPAL"],
+            "Transport": ["CAR", "BUS", "TRAIN", "PLANE", "SHIP", "BIKE", "TRUCK", "TAXI", "BOAT", "JET", "TRAM", "VAN", "FERRY", "SUBWAY", "YACHT"],
+            "Gadgets": ["PHONE", "LAPTOP", "TABLET", "CAMERA", "ROBOT", "DRONE", "CLOCK", "RADIO", "MOUSE", "KEYBOARD", "SCREEN", "SPEAKER", "PRINTER", "WATCH", "CHARGER"]
+        };
+
+        const TOPIC_ICONS = {
+            "Places": "\uD83C\uDF0D",
+            "Animals": "\uD83D\uDC3E",
+            "Food & Drinks": "\uD83C\uDF54",
+            "Buildings": "\uD83C\uDFE2",
+            "Jewelery": "\uD83D\uDC8D",
+            "Transport": "\uD83D\uDE82",
+            "Gadgets": "\uD83D\uDCF1"
+        };
+
+        const DICTIONARY = new Set([
+            ...Object.values(TOPICS).flat(),
+            "GAME", "WORD", "FIND", "GRID", "PLAY", "HIGH", "TIME", "QUIT", "HALT", "TEAM",
+            "CODE", "JAVA", "HTML", "FILE", "TEXT", "TASK", "PLAN", "USER", "PAGE", "NODE",
+            "QUEST", "TABLE", "SCORE", "ROUND", "START", "RESET", "BOARD", "DRAG", "LINE",
+            "HOUSE", "WORLD", "HAPPY", "GREEN", "PIZZA", "WATER", "SOUND", "SMART", "BRAIN",
+            "LETTER", "MATRIX", "PUZZLE", "SYSTEM", "DESIGN", "ACTIVE", "BUTTON", "PREVIEW",
+            "VICTORY", "CONFIRM", "COMPASS", "CREATIVE", "DEVELOP", "ENGLISH", "DYNAMIC"
+        ]);
+
+        let gameState = "IDLE";
+        let score = 0;
+        let foundWords = [];
+        let highSc = localStorage.getItem("wordQuestHighScore") || 0;
+        let gridLetters = [];
+        let selectedCells = [];
+        let isSelecting = false;
+        let currentTopic = null;
+        let topicWords = [];
+        let foundTopicWords = [];
+        let cluesVisible = false;
+
+        const gridElement = document.getElementById("grid-board");
+        const previewElement = document.getElementById("word-preview");
+
+        document.getElementById("high-score").textContent = highSc;
+
+        function shuffleArray(arr) {
+            for (let i = arr.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [arr[i], arr[j]] = [arr[j], arr[i]];
+            }
+            return arr;
+        }
+
+        function initGrid() {
+            gridElement.querySelectorAll('.cell').forEach(c => c.remove());
+            gridLetters = Array(64).fill(null);
+
+            let wordPool = shuffleArray([...TOPICS[currentTopic]]);
+            let chosen = [];
+            for (let i = 0; i < 5 && i < wordPool.length; i++) {
+                chosen.push(wordPool[i]);
+            }
+            topicWords = chosen;
+            foundTopicWords = [];
+
+            chosen.forEach(word => {
+                let placed = false;
+                let attempts = 0;
+                while (!placed && attempts < 200) {
+                    const direction = Math.random() > 0.5 ? 'H' : 'V';
+                    const row = Math.floor(Math.random() * 8);
+                    const col = Math.floor(Math.random() * 8);
+                    
+                    if (direction === 'H' && col + word.length <= 8) {
+                        let fits = true;
+                        for (let i = 0; i < word.length; i++) {
+                            const gridIdx = row * 8 + (col + i);
+                            if (gridLetters[gridIdx] !== null && gridLetters[gridIdx] !== word[i]) {
+                                fits = false;
+                                break;
+                            }
+                        }
+                        if (fits) {
+                            for (let i = 0; i < word.length; i++) {
+                                gridLetters[row * 8 + (col + i)] = word[i];
+                            }
+                            placed = true;
+                        }
+                    } else if (direction === 'V' && row + word.length <= 8) {
+                        let fits = true;
+                        for (let i = 0; i < word.length; i++) {
+                            const gridIdx = (row + i) * 8 + col;
+                            if (gridLetters[gridIdx] !== null && gridLetters[gridIdx] !== word[i]) {
+                                fits = false;
+                                break;
+                            }
+                        }
+                        if (fits) {
+                            for (let i = 0; i < word.length; i++) {
+                                gridLetters[(row + i) * 8 + col] = word[i];
+                            }
+                            placed = true;
+                        }
+                    }
+                    attempts++;
+                }
+            });
+
+            const alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+            for (let i = 0; i < 64; i++) {
+                if (gridLetters[i] === null) {
+                    gridLetters[i] = alphabet[Math.floor(Math.random() * alphabet.length)];
+                }
+            }
+
+            for (let i = 0; i < 64; i++) {
+                const cell = document.createElement("div");
+                cell.classList.add("cell");
+                cell.dataset.index = i;
+                cell.textContent = gridLetters[i];
+                
+                cell.addEventListener("mousedown", (e) => startSelection(i));
+                cell.addEventListener("mouseenter", (e) => handleSelectionEnter(i));
+                cell.addEventListener("touchstart", (e) => {
+                    e.preventDefault();
+                    startSelection(i);
+                });
+
+                gridElement.appendChild(cell);
+            }
+        }
+
+        function renderTopicButtons() {
+            const container = document.getElementById("topic-buttons");
+            container.innerHTML = "";
+            const topicNames = Object.keys(TOPICS);
+            topicNames.forEach(name => {
+                const btn = document.createElement("button");
+                btn.classList.add("topic-btn");
+                btn.textContent = `${TOPIC_ICONS[name] || ""} ${name}`;
+                btn.addEventListener("click", () => selectTopic(name));
+                container.appendChild(btn);
+            });
+        }
+
+        function renderWordList() {
+            const container = document.getElementById("word-list");
+            container.innerHTML = "";
+            topicWords.forEach((word, i) => {
+                const item = document.createElement("div");
+                item.classList.add("word-item");
+                item.id = `word-item-${i}`;
+                const found = foundTopicWords.includes(word);
+                if (found) item.classList.add("found");
+                const pts = word.length === 3 ? 30 : word.length === 4 ? 50 : word.length === 5 ? 80 : 120;
+                item.innerHTML = `
+                    <span class="mark">${found ? "✓" : ""}</span>
+                    <span class="word-text">${word}</span>
+                    <span class="word-pts">${found ? "+" + pts : ""}</span>
+                `;
+                container.appendChild(item);
+            });
+        }
+
+        function updateWordList() {
+            topicWords.forEach((word, i) => {
+                const item = document.getElementById(`word-item-${i}`);
+                if (item) {
+                    const found = foundTopicWords.includes(word);
+                    item.classList.toggle("found", found);
+                    const mark = item.querySelector(".mark");
+                    const ptsEl = item.querySelector(".word-pts");
+                    if (mark) mark.textContent = found ? "✓" : "";
+                    const pts = word.length === 3 ? 30 : word.length === 4 ? 50 : word.length === 5 ? 80 : 120;
+                    if (ptsEl) ptsEl.textContent = found ? "+" + pts : "";
+                }
+            });
+        }
+
+        function toggleClues() {
+            cluesVisible = !cluesVisible;
+            const container = document.getElementById("clue-list-container");
+            const btn = document.getElementById("btn-clues");
+            container.classList.toggle("hidden", !cluesVisible);
+            btn.textContent = cluesVisible ? "\uD83D\uDCA1 Hide Clues" : "\uD83D\uDCA1 Show Clues";
+            btn.classList.toggle("active", cluesVisible);
+        }
+
+        function selectTopic(topic) {
+            currentTopic = topic;
+            gameState = "PLAYING";
+            score = 0;
+            foundWords = [];
+            foundTopicWords = [];
+            cluesVisible = false;
+            document.getElementById("round-score").textContent = "0";
+            document.getElementById("words-count-display").textContent = "0/5";
+            document.getElementById("words-badge").textContent = "0 / 5";
+            document.getElementById("found-words-tbody").innerHTML = "";
+
+            document.getElementById("start-overlay").classList.add("hidden");
+            document.getElementById("halt-overlay").classList.add("hidden");
+            document.getElementById("complete-overlay").classList.add("hidden");
+
+            document.getElementById("topic-display").textContent = `${TOPIC_ICONS[topic] || ""} ${topic}`;
+            document.getElementById("header-topic").textContent = `${TOPIC_ICONS[topic] || ""} ${topic}`;
+            document.getElementById("header-topic").classList.remove("hidden");
+
+            const clueBtn = document.getElementById("btn-clues");
+            clueBtn.textContent = "\uD83D\uDCA1 Show Clues";
+            clueBtn.classList.remove("active");
+            document.getElementById("clue-list-container").classList.add("hidden");
+
+            initGrid();
+            clearSelectionEffects();
+            renderWordList();
+            previewElement.textContent = "DRAG TO SELECT";
+        }
+
+        window.addEventListener("mouseup", endSelection);
+        gridElement.addEventListener("touchmove", (e) => {
+            if (!isSelecting) return;
+            const touch = e.touches[0];
+            const target = document.elementFromPoint(touch.clientX, touch.clientY);
+            if (target && target.classList.contains("cell")) {
+                const idx = parseInt(target.dataset.index);
+                handleSelectionEnter(idx);
+            }
+        });
+        window.addEventListener("touchend", endSelection);
+
+        function startSelection(index) {
+            if (gameState !== "PLAYING") return;
+            isSelecting = true;
+            selectedCells = [index];
+            highlightCell(index, true);
+            updatePreview();
+        }
+
+        function handleSelectionEnter(index) {
+            if (!isSelecting || gameState !== "PLAYING") return;
+            const alreadySelectedIdx = selectedCells.indexOf(index);
+            if (alreadySelectedIdx !== -1) {
+                if (alreadySelectedIdx === selectedCells.length - 2) {
+                    const removed = selectedCells.pop();
+                    highlightCell(removed, false);
+                    updatePreview();
+                }
+                return;
+            }
+            const lastIdx = selectedCells[selectedCells.length - 1];
+            if (isAdjacent(lastIdx, index)) {
+                selectedCells.push(index);
+                highlightCell(index, true);
+                updatePreview();
+            }
+        }
+
+        function endSelection() {
+            if (!isSelecting) return;
+            isSelecting = false;
+            const selectedWord = selectedCells.map(idx => gridLetters[idx]).join("");
+            if (selectedWord.length >= 3) {
+                validateWord(selectedWord);
+            } else {
+                clearSelectionEffects();
+            }
+        }
+
+        function isAdjacent(idxA, idxB) {
+            const rowA = Math.floor(idxA / 8);
+            const colA = idxA % 8;
+            const rowB = Math.floor(idxB / 8);
+            const colB = idxB % 8;
+            const rowDiff = Math.abs(rowA - rowB);
+            const colDiff = Math.abs(colA - colB);
+            return rowDiff <= 1 && colDiff <= 1;
+        }
+
+        function highlightCell(index, active) {
+            const cells = gridElement.querySelectorAll(".cell");
+            const cell = Array.from(cells).find(c => parseInt(c.dataset.index) === index);
+            if (cell) {
+                if (active) {
+                    cell.classList.add("selected");
+                } else {
+                    cell.classList.remove("selected");
+                }
+            }
+        }
+
+        function updatePreview() {
+            const word = selectedCells.map(idx => gridLetters[idx]).join("");
+            previewElement.textContent = word || "DRAG TO SELECT";
+        }
+
+        function clearSelectionEffects() {
+            const cells = gridElement.querySelectorAll(".cell");
+            cells.forEach(c => c.classList.remove("selected"));
+            selectedCells = [];
+            updatePreview();
+        }
+
+        function validateWord(word) {
+            const inDictionary = DICTIONARY.has(word);
+            const inTopic = TOPICS[currentTopic].includes(word);
+            const alreadyFound = foundTopicWords.includes(word);
+
+            const cells = gridElement.querySelectorAll(".cell");
+            const activeDOMCells = Array.from(cells).filter(c => selectedCells.includes(parseInt(c.dataset.index)));
+
+            if (inDictionary && inTopic && !alreadyFound) {
+                activeDOMCells.forEach(c => {
+                    c.classList.remove("selected");
+                    c.classList.add("correct");
+                    setTimeout(() => c.classList.remove("correct"), 800);
+                });
+
+                let pts = 30;
+                if (word.length === 4) pts = 50;
+                else if (word.length === 5) pts = 80;
+                else if (word.length >= 6) pts = 120;
+
+                score += pts;
+                foundWords.push(word);
+                foundTopicWords.push(word);
+
+                document.getElementById("round-score").textContent = score;
+                document.getElementById("words-count-display").textContent = `${foundWords.length}/5`;
+                document.getElementById("words-badge").textContent = `${foundWords.length} / 5`;
+
+                const tbody = document.getElementById("found-words-tbody");
+                const row = document.createElement("tr");
+                row.classList.add("word-row");
+                row.innerHTML = `
+                    <td style="font-weight: 600; color: var(--primary-accent);">${word}</td>
+                    <td>${word.length}</td>
+                    <td><span class="score-pill">+${pts}</span></td>
+                `;
+                tbody.appendChild(row);
+
+                updateWordList();
+
+                if (foundWords.length >= 5) {
+                    completeGame();
+                }
+
+            } else {
+                activeDOMCells.forEach(c => {
+                    c.classList.remove("selected");
+                    c.classList.add("incorrect");
+                    setTimeout(() => c.classList.remove("incorrect"), 800);
+                });
+            }
+
+            setTimeout(clearSelectionEffects, 200);
+        }
+
+        function resetRound() {
+            if (gameState === "IDLE" || !currentTopic) return;
+            foundWords = [];
+            foundTopicWords = [];
+            score = 0;
+            document.getElementById("round-score").textContent = "0";
+            document.getElementById("words-count-display").textContent = "0/5";
+            document.getElementById("words-badge").textContent = "0 / 5";
+            document.getElementById("found-words-tbody").innerHTML = "";
+            selectTopic(currentTopic);
+        }
+
+        function backToTopics() {
+            currentTopic = null;
+            gameState = "IDLE";
+            score = 0;
+            foundWords = [];
+            foundTopicWords = [];
+            cluesVisible = false;
+            gridLetters = [];
+            gridElement.querySelectorAll('.cell').forEach(c => c.remove());
+            document.getElementById("round-score").textContent = "0";
+            document.getElementById("words-count-display").textContent = "0/5";
+            document.getElementById("words-badge").textContent = "0 / 5";
+            document.getElementById("found-words-tbody").innerHTML = "";
+            document.getElementById("topic-display").textContent = "\uD83C\uDF0D Select a Topic";
+            document.getElementById("header-topic").classList.add("hidden");
+            document.getElementById("word-list").innerHTML = "";
+            document.getElementById("clue-list-container").classList.add("hidden");
+            const clueBtn = document.getElementById("btn-clues");
+            clueBtn.textContent = "\uD83D\uDCA1 Show Clues";
+            clueBtn.classList.remove("active");
+            document.getElementById("word-preview").textContent = "CHOOSE A TOPIC";
+            document.getElementById("start-overlay").classList.remove("hidden");
+            document.getElementById("halt-overlay").classList.add("hidden");
+            document.getElementById("complete-overlay").classList.add("hidden");
+        }
+
+        function haltGame() {
+            if (gameState !== "PLAYING") return;
+            gameState = "HALTED";
+            document.getElementById("halt-overlay").classList.remove("hidden");
+        }
+
+        function resumeGame() {
+            gameState = "PLAYING";
+            document.getElementById("halt-overlay").classList.add("hidden");
+        }
+
+        function completeGame() {
+            gameState = "COMPLETED";
+            if (score > highSc) {
+                highSc = score;
+                localStorage.setItem("wordQuestHighScore", highSc);
+                document.getElementById("high-score").textContent = highSc;
+            }
+            document.getElementById("complete-desc").textContent = `Excellent! You found all 5 words and scored ${score} points!`;
+            document.getElementById("complete-overlay").classList.remove("hidden");
+        }
+
+        renderTopicButtons();
+
+        document.getElementById("btn-clues").addEventListener("click", toggleClues);
+        document.getElementById("btn-new-topic").addEventListener("click", backToTopics);
+        document.getElementById("btn-reset").addEventListener("click", resetRound);
+        document.getElementById("btn-halt").addEventListener("click", haltGame);
+        document.getElementById("btn-resume").addEventListener("click", resumeGame);
+        document.getElementById("btn-new-game").addEventListener("click", backToTopics);
+    </script>
+</body>
+</html>
