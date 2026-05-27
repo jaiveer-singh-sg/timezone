@@ -4,23 +4,44 @@ name: Local Config
 version: 1.0.0
 schema: v1
 models:
-  - name: qwen
+  - name: qwenhp
     provider: ollama
     model: qwen2.5-coder:latest
     apiBaseUrl: http://localhost:11434
-    role:
+    roles:
       - chat
       - edit
       - apply
-  - name: qwen
+  - name: qwenhp
     provider: ollama
     model: qwen2.5-coder:latest
     apiBaseUrl: http://localhost:11434
-    role:
+    roles:
       - autocomplete
-  - name: qwen
+  - name: qwenhp
     provider: ollama
     model: qwen2.5-coder:latest
     apiBaseUrl: http://localhost:11434
-    role:
+    roles:
+      - embed
+
+  - name: qwen1.5
+    provider: ollama
+    model: qwen2.5-coder:1.5b
+    apiBaseUrl: http://localhost:11434
+    roles:
+      - chat
+      - edit
+      - apply
+  - name: qwen1.5
+    provider: ollama
+    model: qwen2.5-coder:1.5b
+    apiBaseUrl: http://localhost:11434
+    roles:
+      - autocomplete
+  - name: qwen1.5
+    provider: ollama
+    model: qwen2.5-coder:1.5b
+    apiBaseUrl: http://localhost:11434
+    roles:
       - embed
