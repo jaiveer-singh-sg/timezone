@@ -1,0 +1,26 @@
+Unable to place the 3rd block (the horizontal 3-block piece) into the top-right (3x3) Sudoku box whereas there is clear horizontal empty3 block space remaining within that box. please check blockudoku.html and fix the issue
+
+name: Local Config
+version: 1.0.0
+schema: v1
+models:
+  - name: qwen
+    provider: ollama
+    model: qwen2.5-coder:latest
+    apiBaseUrl: http://localhost:11434
+    role:
+      - chat
+      - edit
+      - apply
+  - name: qwen
+    provider: ollama
+    model: qwen2.5-coder:latest
+    apiBaseUrl: http://localhost:11434
+    role:
+      - autocomplete
+  - name: qwen
+    provider: ollama
+    model: qwen2.5-coder:latest
+    apiBaseUrl: http://localhost:11434
+    role:
+      - embed
